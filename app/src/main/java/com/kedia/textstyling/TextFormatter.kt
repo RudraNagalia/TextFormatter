@@ -28,9 +28,6 @@ fun EditText.textFormatter(textFormats: List<TextFormat>) {
     val charactersPairList: MutableMap<Char, MutableList<Pair<Int, Int>>> = mutableMapOf()
     val positionPairList: MutableMap<Char, Pair<Int, Int>> = mutableMapOf()
 
-//    val list: MutableList<Pair<Int, Int>> = mutableListOf()
-//    var pair: Pair<Int, Int> = Pair(-1, -1)
-
     this.addTextChangedListener(CharacterWatcher(object : CharacterWatcher.OnSequenceChanged {
         override fun characterAdded(
             index: Int,
@@ -39,18 +36,18 @@ fun EditText.textFormatter(textFormats: List<TextFormat>) {
         ) {
             addedCharacter?.let {
                 if (it in characterFormatMap.keys) {
-                    var pair = positionPairList.get(it) ?: emptyPair
+                    var pair = if (charactersPairList.containsKey(it)) charactersPairList?.get(it)?.last() ?: emptyPair else positionPairList.get(it) ?: emptyPair
                     /**
                      * If pair = Pair(-1,-1), then check for the pair in the list
                      * of pairs too
                      */
-
-                    Log.d("TAG!!!!", "pair $it $pair $positionPairList")
-
                     if (pair.first == -1) {
                         pair = Pair(index, -1)
                     }
                     else if (pair.second == -1) {
+                        charactersPairList?.get(it)?.remove(pair)
+                        if (charactersPairList.get(it)?.isEmpty() == true)
+                            charactersPairList.remove(it)
                         pair = Pair(pair.first, index)
                         if (charactersPairList.containsKey(it).not())
                             charactersPairList[addedCharacter] = mutableListOf()
@@ -59,7 +56,6 @@ fun EditText.textFormatter(textFormats: List<TextFormat>) {
                         pair = emptyPair
                     }
                     positionPairList[it] = pair
-                    Log.d("TAG!!!!", "called $charactersPairList $pair")
                 }
             }
 
@@ -87,7 +83,23 @@ fun EditText.textFormatter(textFormats: List<TextFormat>) {
             deletedCharacter: Char?,
             sequence: CharSequence?
         ) {
+            deletedCharacter?.let {
+                if (it in characterFormatMap.keys) {
+                    var pair = positionPairList.get(it) ?: emptyPair
+                    if (pair == emptyPair)
+                        pair = if (charactersPairList.containsKey(it)) charactersPairList.get(it)?.last() ?: emptyPair else emptyPair
 
+                    charactersPairList.get(it)?.remove(pair)
+                    if (charactersPairList.get(it)?.isEmpty() == true)
+                        charactersPairList.remove(it)
+                    if (pair.second != -1) {
+                        pair = Pair(pair.first, -1)
+                        charactersPairList?.get(it)?.add(pair)
+                    } else {
+                        pair = emptyPair
+                    }
+                }
+            }
         }
 
     }))

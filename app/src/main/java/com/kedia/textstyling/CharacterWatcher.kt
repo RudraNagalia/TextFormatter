@@ -25,24 +25,22 @@ class CharacterWatcher constructor(private val listener: OnSequenceChanged): Tex
     }
 
     override fun onTextChanged(sequence: CharSequence?, start: Int, before: Int, count: Int) {
-        /**
-         * Strange behavior in Android, method called twice (or more than that) randomly
-         */
-        if (System.currentTimeMillis() - lastTime < debounceTime)
-            return
-        lastTime = System.currentTimeMillis()
-
-        /**
-         * When character is added
-         * The 'index' variable specifies the index of newly added character
-         */
-
-        var index = start + before // if (before == 0) start else if (before < count) before else before// - 1
         if (lastLength <= (sequence?.length ?: 0)) {
+            /**
+             * Strange behavior in Android, method called twice (or more than that) randomly
+             */
+            if (System.currentTimeMillis() - lastTime < debounceTime)
+                return
+            lastTime = System.currentTimeMillis()
+
+            /**
+             * When character is added
+             * The 'index' variable specifies the index of newly added character
+             */
+            var index = start + before // if (before == 0) start else if (before < count) before else before// - 1
+
             if (index == sequence?.length)
                 index -= 1
-
-//            Log.d("TAG!!!!!", "in ${System.currentTimeMillis()} $start $before $count ${sequence?.length} ${sequence?.get(index)}")
 
             listener.characterAdded(index, sequence?.get(index), sequence)
         }
