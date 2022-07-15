@@ -11,6 +11,10 @@ class CharacterWatcher constructor(private val listener: OnSequenceChanged): Tex
     private var backspaceIndex = -1
     private var backspaceCharacter: Char? = Char.MIN_VALUE
 
+    private var lastTime = System.currentTimeMillis()
+
+    private val debounceTime = 200
+
     override fun beforeTextChanged(sequence: CharSequence?, start: Int, count: Int, after: Int) {
         val index = if (start == 0) after else start
         previousLength = sequence?.length ?: 0
@@ -21,15 +25,25 @@ class CharacterWatcher constructor(private val listener: OnSequenceChanged): Tex
     }
 
     override fun onTextChanged(sequence: CharSequence?, start: Int, before: Int, count: Int) {
-        var index = start + before //if (before == 0) start else if (before < count) before else before// - 1
+        /**
+         * Strange behavior in Android, method called twice (or more than that) randomly
+         */
+        if (System.currentTimeMillis() - lastTime < debounceTime)
+            return
+        lastTime = System.currentTimeMillis()
+
+        /**
+         * When character is added
+         * The 'index' variable specifies the index of newly added character
+         */
+
+        var index = start + before // if (before == 0) start else if (before < count) before else before// - 1
         if (lastLength <= (sequence?.length ?: 0)) {
-            /**
-             * When character is added
-             * The 'index' variable specifies the index of newly added character
-             */
             if (index == sequence?.length)
                 index -= 1
-//            Log.d("TAG!!!!", "in $start $before $count ${sequence?.length} ${sequence?.get(index)}")
+
+//            Log.d("TAG!!!!!", "in ${System.currentTimeMillis()} $start $before $count ${sequence?.length} ${sequence?.get(index)}")
+
             listener.characterAdded(index, sequence?.get(index), sequence)
         }
         if (previousLength > (sequence?.length ?: 0)) {

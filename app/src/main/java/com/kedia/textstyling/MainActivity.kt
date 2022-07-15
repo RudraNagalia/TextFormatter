@@ -9,6 +9,11 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        edit.textFormatter()
+        val list = mutableListOf<TextFormat>()
+        list.apply {
+            add(TextFormat('*', TextStyle.BOLD))
+            add(TextFormat('~', TextStyle.ITALICS))
+        }
+        edit.textFormatter(list)
     }
 }
