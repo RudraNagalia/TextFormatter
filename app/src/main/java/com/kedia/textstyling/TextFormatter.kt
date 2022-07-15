@@ -2,10 +2,12 @@ package com.kedia.textstyling
 
 import android.graphics.Typeface
 import android.text.Spannable
+import android.text.style.CharacterStyle
 import android.text.style.StyleSpan
 import android.text.style.UnderlineSpan
 import android.util.Log
 import android.widget.EditText
+import androidx.core.text.getSpans
 import kotlinx.android.synthetic.main.activity_main.view.*
 
 class TextFormatter {
@@ -41,6 +43,7 @@ fun EditText.textFormatter(textFormats: List<TextFormat>) {
                      * If pair = Pair(-1,-1), then check for the pair in the list
                      * of pairs too
                      */
+                    logE("called here $pair $charactersPairList")
                     if (pair.first == -1) {
                         pair = Pair(index, -1)
                     }
@@ -50,7 +53,7 @@ fun EditText.textFormatter(textFormats: List<TextFormat>) {
                             charactersPairList.remove(it)
                         pair = Pair(pair.first, index)
                         if (charactersPairList.containsKey(it).not())
-                            charactersPairList[addedCharacter] = mutableListOf()
+                            charactersPairList[it] = mutableListOf()
 
                         charactersPairList[it]?.add(pair)
                         pair = emptyPair
@@ -63,13 +66,10 @@ fun EditText.textFormatter(textFormats: List<TextFormat>) {
                 for (character in charactersPairList.keys) {
                     val list = charactersPairList.get(character) ?: listOf<Pair<Int, Int>>()
                     val style = characterFormatMap.get(character)
-                    val span = when(style) {
-                        TextStyle.BOLD -> StyleSpan(Typeface.BOLD)
-                        TextStyle.ITALICS -> StyleSpan(Typeface.ITALIC)
-                        TextStyle.UNDERLINE -> UnderlineSpan()
-                        null -> null
-                    }
+                    val span = getStyleSpan(style)
                     for (pair in list) {
+                        if (pair.first == -1 || pair.second == -1)
+                            return
                         span?.let {
                             this@textFormatter.text.setSpan(it, pair.first + 1, pair.second, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
                         }
@@ -94,9 +94,27 @@ fun EditText.textFormatter(textFormats: List<TextFormat>) {
                         charactersPairList.remove(it)
                     if (pair.second != -1) {
                         pair = Pair(pair.first, -1)
+                        if (charactersPairList.containsKey(it).not())
+                            charactersPairList[it] = mutableListOf()
                         charactersPairList?.get(it)?.add(pair)
                     } else {
                         pair = emptyPair
+                    }
+                }
+            }
+
+            if (charactersPairList.isNotEmpty()) {
+                for (character in charactersPairList.keys) {
+                    val list = charactersPairList.get(character) ?: listOf<Pair<Int, Int>>()
+                    val style = characterFormatMap.get(character)
+                    val span = getStyleSpan(style)
+                    for (pair in list) {
+                        span?.let {
+                            val addedSpan = this@textFormatter.text.getSpans<CharacterStyle>(pair.first)
+                            if (addedSpan.isNotEmpty()) {
+                                this@textFormatter.text.removeSpan(addedSpan.first())
+                            }
+                        }
                     }
                 }
             }

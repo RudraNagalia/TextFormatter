@@ -9,5 +9,6 @@ data class TextFormat(
 enum class TextStyle {
     BOLD,
     ITALICS,
-    UNDERLINE
+    UNDERLINE,
+    STRIKETHROUGH
 }

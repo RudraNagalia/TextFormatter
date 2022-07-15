@@ -12,7 +12,8 @@ class MainActivity : AppCompatActivity() {
         val list = mutableListOf<TextFormat>()
         list.apply {
             add(TextFormat('*', TextStyle.BOLD))
-            add(TextFormat('~', TextStyle.ITALICS))
+            add(TextFormat('_', TextStyle.ITALICS))
+            add(TextFormat('~', TextStyle.STRIKETHROUGH))
         }
         edit.textFormatter(list)
     }
