@@ -73,19 +73,19 @@ fun EditText.textFormatter(textFormats: List<TextFormat>) {
                         pair = emptyPair
                     }
                     positionPairList[it] = pair
-                }
-            }
 
-            if (charactersPairList.isNotEmpty()) {
-                for (character in charactersPairList.keys) {
-                    val list = charactersPairList.get(character) ?: listOf()
-                    val style = characterFormatMap.get(character)
-                    val span = getStyleSpan(style)
-                    for (pair in list) {
-                        if (pair.first == -1 || pair.second == -1)
-                            return
-                        span?.let {
-                            this@textFormatter.text.setSpan(it, pair.first + 1, pair.second, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    if (charactersPairList.isNotEmpty()) {
+                        for (character in charactersPairList.keys) {
+                            val list = charactersPairList.get(character) ?: listOf()
+                            val style = characterFormatMap.get(character)
+                            val span = getStyleSpan(style)
+                            for (addedPair in list) {
+                                if (addedPair.first == -1 || addedPair.second == -1)
+                                    return
+                                span?.let {
+                                    this@textFormatter.text.setSpan(it, addedPair.first + 1, addedPair.second, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                                }
+                            }
                         }
                     }
                 }
@@ -103,6 +103,8 @@ fun EditText.textFormatter(textFormats: List<TextFormat>) {
                     if (pair == emptyPair)
                         pair = if (charactersPairList.containsKey(it)) charactersPairList.get(it)?.last() ?: emptyPair else emptyPair
 
+                    logE("ca;;ed up $pair $charactersPairList $positionPairList")
+
                     charactersPairList.get(it)?.remove(pair)
                     if (charactersPairList.get(it)?.isEmpty() == true)
                         charactersPairList.remove(it)
@@ -114,24 +116,29 @@ fun EditText.textFormatter(textFormats: List<TextFormat>) {
                     } else {
                         pair = emptyPair
                     }
-                }
-            }
+                    logE("called $charactersPairList $positionPairList")
 
-            if (charactersPairList.isNotEmpty()) {
-                for (character in charactersPairList.keys) {
-                    val list = charactersPairList.get(character) ?: listOf<Pair<Int, Int>>()
-                    val style = characterFormatMap.get(character)
-                    val span = getStyleSpan(style)
-                    for (pair in list) {
-                        span?.let {
-                            val addedSpan = this@textFormatter.text.getSpans<CharacterStyle>(pair.first)
-                            if (addedSpan.isNotEmpty()) {
-                                this@textFormatter.text.removeSpan(addedSpan.first())
+                    if (charactersPairList.isNotEmpty()) {
+                        for (character in charactersPairList.keys) {
+                            val list = charactersPairList.get(character) ?: listOf<Pair<Int, Int>>()
+                            val style = characterFormatMap.get(character)
+                            val span = getStyleSpan(style)
+                            for (addedPair in list) {
+                                span?.let {
+                                    if (addedPair.second == -1) {
+                                        val addedSpan = this@textFormatter.text.getSpans<CharacterStyle>(addedPair.first)
+                                        if (addedSpan.isNotEmpty()) {
+                                            this@textFormatter.text.removeSpan(addedSpan.first())
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
+
                 }
             }
+
         }
 
     }))
