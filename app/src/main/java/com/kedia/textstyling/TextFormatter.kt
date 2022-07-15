@@ -78,7 +78,7 @@ fun EditText.textFormatter(textFormats: List<TextFormat>) {
 
             if (charactersPairList.isNotEmpty()) {
                 for (character in charactersPairList.keys) {
-                    val list = charactersPairList.get(character) ?: listOf<Pair<Int, Int>>()
+                    val list = charactersPairList.get(character) ?: listOf()
                     val style = characterFormatMap.get(character)
                     val span = getStyleSpan(style)
                     for (pair in list) {
