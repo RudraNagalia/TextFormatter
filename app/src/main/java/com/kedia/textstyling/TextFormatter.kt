@@ -38,12 +38,26 @@ fun EditText.textFormatter(textFormats: List<TextFormat>) {
         ) {
             addedCharacter?.let {
                 if (it in characterFormatMap.keys) {
-                    var pair = if (charactersPairList.containsKey(it)) charactersPairList?.get(it)?.last() ?: emptyPair else positionPairList.get(it) ?: emptyPair
+
                     /**
                      * If pair = Pair(-1,-1), then check for the pair in the list
                      * of pairs too
                      */
-                    logE("called here $pair $charactersPairList")
+                    var pair = emptyPair
+                    if ((positionPairList.get(it) ?: emptyPair) == emptyPair) {
+                        if (charactersPairList.containsKey(it)) {
+                            pair = charactersPairList.get(it)?.last() ?: emptyPair
+                        }
+                    } else {
+                        pair = positionPairList.get(it) ?: emptyPair
+                    }
+
+                    if (pair.isComplete()) {
+                        if (!pair.contains(index)) {
+                            pair = emptyPair
+                        }
+                    }
+
                     if (pair.first == -1) {
                         pair = Pair(index, -1)
                     }

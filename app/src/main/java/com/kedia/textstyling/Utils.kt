@@ -18,3 +18,11 @@ fun getStyleSpan(textStyle: TextStyle?): CharacterStyle? {
         null -> null
     }
 }
+
+fun Pair<Int, Int>.isComplete(): Boolean {
+    return this.first != -1 && this.second != -1
+}
+
+fun Pair<Int, Int>.contains(index: Int): Boolean {
+    return this.first < index && this.second > index
+}
