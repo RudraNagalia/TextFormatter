@@ -48,7 +48,7 @@ fun EditText.textFormatter(textFormats: List<TextFormat>) {
                     }
 
                     if (triple.isComplete()) {
-                        if (!triple.contains(index)) {
+                        if (!(index `in` triple)) {
                             triple = emptyTriple
                         }
                     }
