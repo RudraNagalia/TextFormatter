@@ -23,6 +23,18 @@ fun Pair<Int, Int>.isComplete(): Boolean {
     return this.first != -1 && this.second != -1
 }
 
+fun Triple<Int, Int, Any>.isComplete(): Boolean {
+    return this.first != -1 && this.second != -1
+}
+
 fun Pair<Int, Int>.contains(index: Int): Boolean {
     return this.first < index && this.second > index
+}
+
+fun Triple<Int, Int, Any>.contains(index: Int): Boolean {
+    return this.first < index && this.second > index
+}
+
+infix fun Int.`in`(triple: Triple<Int, Int, Any>): Boolean {
+    return triple.first < this && triple.second > this
 }
